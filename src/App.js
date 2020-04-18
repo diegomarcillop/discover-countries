@@ -1,24 +1,47 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import Searcher from "./components/searcher";
+import { useState } from "react";
+import Axios from "axios";
+import Country from "./components/country";
 
 function App() {
+  const [country, setCountry] = useState();
+
+  const onChange = async (evt) => {
+    /*   await Axios.get(`https://restcountries.eu/rest/v2/name/${evt.target.value}?fullText=true`)
+      .then(({data}) => {
+        setCountry(data);
+      })
+      .catch((err) => { 
+      }); */
+
+    let value = evt.target.value;
+
+    
+    await Axios.get(`https://restcountries.eu/rest/v2/all`)
+      .then(({ data }) => {
+        const country = data.find((country) => country.name.toLowerCase() === value.toLowerCase());
+        setCountry(country);
+      })
+      .catch((err) => {});
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="container">
+        <div className="columns is-mobile is-centered">
+          <div className="column is-three-fifths">
+            <Searcher onChange={onChange} />
+            {country !== undefined ? (
+              <Country country={country} />
+            ) : (
+              <div style={{ textAlign: "center" }}>
+                <h3>Sin resultados</h3>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
